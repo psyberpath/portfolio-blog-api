@@ -2,7 +2,6 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    # container_name: blog_postgres
     restart: always
     environment:
       POSTGRES_USER: blog_user
@@ -13,5 +12,14 @@ services:
     volumes:
       - blog-db-data-v3:/var/lib/postgresql/data
 
+  redis:
+    image: redis:6-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
 volumes:
   blog-db-data-v3:
+  redis-data:
