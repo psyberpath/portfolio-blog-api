@@ -11,6 +11,6 @@ import { NewsletterService } from './newsletter.service';
     }),
   ],
   controllers: [NewsletterController],
-  providers: [NewsletterService],
+  providers: [NewsletterService, NewsletterProcessor],
 })
 export class NewsletterModule {}

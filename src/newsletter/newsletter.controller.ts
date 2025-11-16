@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
+import { NewsletterService } from './newsletter.service';
 
 @Controller('newsletter')
-export class NewsletterController {}
+export class NewsletterController {
+  constructor(private readonly newsletterService: NewsletterService) {}
+  @Post('subscribe')
+  async subscribe(@Body('email') email: string) {
+    await this.newsletterService.subscribe(email);
+    return { success: true, message: 'Newsletter subscription successful' };
+  }
+}
