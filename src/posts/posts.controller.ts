@@ -8,6 +8,8 @@ import {
   Request,
   UseInterceptors,
   Inject,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -19,6 +21,7 @@ import {
   CACHE_MANAGER,
 } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -48,5 +51,21 @@ export class PostsController {
   @Get(':slug')
   findOne(@Param('slug') slug: string) {
     return this.postsService.findOne(slug);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @Request() req: { user: User },
+  ) {
+    return this.postsService.update(id, updatePostDto, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string, @Request() req: { user: User }) {
+    return this.postsService.remove(id, req.user.id);
   }
 }

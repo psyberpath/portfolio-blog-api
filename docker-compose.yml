@@ -6,11 +6,23 @@ services:
     environment:
       POSTGRES_USER: blog_user
       POSTGRES_PASSWORD: blog_password
-      POSTGRES_DATABASE: blog_db
+      POSTGRES_DB: blog_db
     ports:
       - '5432:5432'
     volumes:
       - blog-db-data-v3:/var/lib/postgresql/data
+
+  db_test:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: blog_user_test
+      POSTGRES_PASSWORD: blog_password_test
+      POSTGRES_DB: blog_db_test
+    ports:
+      - '5433:5432'
+    volumes:
+      - blog-db-data-test:/var/lib/postgresql/data
 
   redis:
     image: redis:6-alpine
@@ -22,4 +34,5 @@ services:
 
 volumes:
   blog-db-data-v3:
+  blog-db-data-test:
   redis-data:

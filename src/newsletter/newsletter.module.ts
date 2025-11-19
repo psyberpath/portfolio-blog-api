@@ -8,6 +8,10 @@ import { NewsletterService } from './newsletter.service';
   imports: [
     BullModule.registerQueue({
       name: 'email-queue',
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+      },
     }),
   ],
   controllers: [NewsletterController],
