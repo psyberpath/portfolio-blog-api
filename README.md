@@ -25,7 +25,7 @@ This is the backend API for the **Didara Portfolio**. It provides secure authent
 
 ```bash
 # Clone the repo
-git clone [https://github.com/yourusername/nest-blog-api.git](https://github.com/yourusername/nest-blog-api.git)
+git clone https://github.com/psyberpath/nest-blog-api.git
 
 # Install dependencies
 npm install
