@@ -1,79 +1,68 @@
-# NestJS Blog API (Portfolio Backend)
+# portfolio-blog-api
 
-> Production-ready, dockerized CMS backend built with NestJS, PostgreSQL, Redis, and BullMQ.
+A backend API for a personal portfolio blog built with NestJS, PostgreSQL, Redis, and BullMQ. This project powers blog content management, user authentication, and background processing for newsletter subscriptions.
 
-This repository is the backend API for the portfolio website and provides authentication, blog content management, and background processing for newsletter subscriptions.
-
-## 🛠 Stack
+## Stack
 - Language: TypeScript (NestJS)
 - Database: PostgreSQL
 - ORM: TypeORM
-- Cache/Queues: Redis + BullMQ
+- Cache / Queues: Redis + BullMQ
 - Validation: class-validator & class-transformer
-- Logging: Winston (structured JSON)
+- Logging: Winston
 
-## Quick start
+## Quick start (local)
+1. Clone and install
 
-Prerequisites:
-- Node.js v18+
-- Docker & Docker Compose (for local databases)
-
-Install:
 ```bash
 git clone https://github.com/psyberpath/portfolio-blog-api.git
 cd portfolio-blog-api
 npm install
 ```
 
-Create a `.env` from `.env.example` (do not commit your `.env` file).
+2. Create a local environment file
 
-Run local infra (optional):
+```bash
+cp .env.example .env
+# Edit .env to add your local DB/Redis values
+```
+
+3. (Optional) Start local infra
+
 ```bash
 docker-compose up -d
 ```
 
-Run DB migrations:
+4. Run migrations and start
+
 ```bash
 npm run migration:run
-```
-
-Start the app:
-```bash
-# development
 npm run start:dev
-
-# production
-npm run build
-npm run start:prod
 ```
 
-Default app URL: http://localhost:3000
+The API will be available at http://localhost:3000
 
-## Environment / Secrets
-Do NOT put real credentials or secrets in README or committed files. Use `.env` for local development and your host/platform secret manager (Render, Heroku, Vercel, etc.) in production.
+## Build / Production
+Build with:
 
-A `.env.example` is included with placeholder variable names; copy it to `.env` and fill in actual values locally. Immediately rotate any credentials that were previously published in this repository.
+```bash
+npm run build
+```
 
-## API (high level)
-- Authentication: /auth/register, /auth/login (passwords hashed with bcrypt)
-- Posts: /posts (GET public; POST/PATCH/DELETE require Authorization: Bearer <token>)
-- Newsletter: /newsletter/subscribe (enqueued to worker)
-- Health: /health
+The production entrypoint is `node dist/main`.
+
+If deploying to Render or another platform, add the necessary environment variables in the platform's dashboard before deploying. The project expects environment variables for database and Redis connection, JWT secret, and bcrypt salt rounds (see `.env.example`).
+
+## Contributing & Forking
+- Feel free to fork this repository. When contributing, open a PR against the main branch.
+- Keep sensitive credentials out of commits. Use `.env` locally and your platform's secret store for production.
 
 ## Tests
-Unit and integration tests are available:
-```bash
-# unit tests
-npm test
+- Unit tests: `npm test`
+- Integration tests (requires test DB): `npm run test:int`
 
-# integration tests (requires local infra)
-npm run test:int
-```
+## Files of interest
+- src/ — application source
+- data-source.ts — TypeORM datasource configuration
+- docker-compose.yml — local Postgres / Redis for development
+- Dockerfile — multi-stage Dockerfile for building and running
 
-## Security & secrets guidance
-- Never include DB passwords, API keys, or JWT secrets in README or committed files.
-- Add `.env` to `.gitignore`.
-- Use 12+ bcrypt salt rounds or configure via SALT_ROUNDS env var.
-- Rotate any exposed secrets immediately.
-
-For more details see SECURITY.md (new file added).
