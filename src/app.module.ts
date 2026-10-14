@@ -18,12 +18,11 @@ import { APP_GUARD } from '@nestjs/core';
     CoreModule,
     NewsletterModule,
     HealthModule,
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
+    // ThrottlerModule.forRoot expects an options object (ttl in seconds)
+    ThrottlerModule.forRoot({
+      ttl: 60, // 60 seconds window
+      limit: 10,
+    }),
   ],
   controllers: [AppController],
   providers: [

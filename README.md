@@ -1,173 +1,79 @@
 # NestJS Blog API (Portfolio Backend)
 
-> A production-grade, dockerized CMS backend built with NestJS, PostgreSQL, Redis, and BullMQ.
+> Production-ready, dockerized CMS backend built with NestJS, PostgreSQL, Redis, and BullMQ.
 
-This is the backend API for the **Didara Portfolio**. It provides secure authentication, content management for blog posts, and an asynchronous job queue for newsletter subscriptions.
+This repository is the backend API for the portfolio website and provides authentication, blog content management, and background processing for newsletter subscriptions.
 
-## 🛠 Tech Stack
+## 🛠 Stack
+- Language: TypeScript (NestJS)
+- Database: PostgreSQL
+- ORM: TypeORM
+- Cache/Queues: Redis + BullMQ
+- Validation: class-validator & class-transformer
+- Logging: Winston (structured JSON)
 
-* **Framework:** NestJS (TypeScript)
-* **Database:** PostgreSQL (v15)
-* **ORM:** TypeORM (with Migrations)
-* **Caching:** Redis (via `@nestjs/cache-manager`)
-* **Queues:** BullMQ (Redis-backed background jobs)
-* **Validation:** `class-validator` & `class-transformer`
-* **Logging:** Winston (Structured JSON logging)
-* **Deployment:** Docker & Render
+## Quick start
 
-## 🚀 Getting Started
+Prerequisites:
+- Node.js v18+
+- Docker & Docker Compose (for local databases)
 
-### 1. Prerequisites
-* Node.js (v18+)
-* Docker & Docker Compose
-
-### 2. Installation
-
+Install:
 ```bash
-# Clone the repo
-git clone https://github.com/psyberpath/nest-blog-api.git
-
-# Install dependencies
+git clone https://github.com/psyberpath/portfolio-blog-api.git
+cd portfolio-blog-api
 npm install
-````
-
-### 3\. Environment Setup
-
-Create a `.env` file in the root directory:
-
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=blog_user
-DB_PASSWORD=blog_password
-DB_NAME=blog_db
-
-# Test Database (for Integration Tests)
-TEST_DB_HOST=localhost
-TEST_DB_PORT=5433
-TEST_DB_USERNAME=blog_user_test
-TEST_DB_PASSWORD=blog_password_test
-TEST_DB_NAME=blog_db_test
-
-# Redis Configuration (Cache & Queues)
-REDIS_HOST=localhost
-REDIS_PORT=6379
-# REDIS_PASSWORD=redis_password (Optional locally, required for prod)
-
-# Authentication
-JWT_SECRET=super_secret_random_string_here
-
-# Environment
-NODE_ENV=development
-PORT=3000
 ```
 
-### 4\. Running Infrastructure (Docker)
+Create a `.env` from `.env.example` (do not commit your `.env` file).
 
-Start the Postgres and Redis containers:
-
+Run local infra (optional):
 ```bash
 docker-compose up -d
 ```
 
-### 5\. Database Migrations
-
-Initialize the database schema:
-
+Run DB migrations:
 ```bash
-# Run migrations
 npm run migration:run
 ```
 
-### 6\. Start the Server
-
+Start the app:
 ```bash
-# Development mode (Watch mode)
+# development
 npm run start:dev
 
-# Production build
+# production
 npm run build
 npm run start:prod
 ```
 
-API will run on `http://localhost:3000`.
+Default app URL: http://localhost:3000
 
------
+## Environment / Secrets
+Do NOT put real credentials or secrets in README or committed files. Use `.env` for local development and your host/platform secret manager (Render, Heroku, Vercel, etc.) in production.
 
-## 🔌 API Documentation
+A `.env.example` is included with placeholder variable names; copy it to `.env` and fill in actual values locally. Immediately rotate any credentials that were previously published in this repository.
 
-### Base URL
+## API (high level)
+- Authentication: /auth/register, /auth/login (passwords hashed with bcrypt)
+- Posts: /posts (GET public; POST/PATCH/DELETE require Authorization: Bearer <token>)
+- Newsletter: /newsletter/subscribe (enqueued to worker)
+- Health: /health
 
-  * **Local:** `http://localhost:3000`
-  * **Production:** `https://nest-blog-api-5t4u.onrender.com`
-
-### 1\. Authentication
-
-> **Note:** Passwords are hashed using bcrypt.
-
-  * **Register (Admin)**
-      * `POST /auth/register`
-      * **Body:** `{ "email": "admin@example.com", "password": "securePassword123" }`
-  * **Login**
-      * `POST /auth/login`
-      * **Body:** `{ "email": "admin@example.com", "password": "securePassword123" }`
-      * **Response:** `{ "accessToken": "eyJhbGci..." }`
-
-### 2\. Blog Posts
-
-> **Public Access:** Anyone can read.
-> **Admin Access:** Create/Update/Delete requires `Authorization: Bearer <token>`.
-
-  * **Get All Posts (Public)**
-      * `GET /posts`
-      * **Note:** Responses are cached via Redis for 10 minutes.
-  * **Get Single Post (Public)**
-      * `GET /posts/:slug`
-  * **Create Post (Protected)**
-      * `POST /posts`
-      * **Header:** `Authorization: Bearer <token>`
-      * **Body:** `{ "title": "My New Post", "content": "HTML or Markdown content here" }`
-  * **Update Post (Protected)**
-      * `PATCH /posts/:id`
-      * **Body:** `{ "title": "Updated Title" }` (Partial update)
-  * **Delete Post (Protected)**
-      * `DELETE /posts/:id`
-
-### 3\. Newsletter (Background Jobs)
-
-> Uses BullMQ to process subscriptions asynchronously.
-
-  * **Subscribe**
-      * `POST /newsletter/subscribe`
-      * **Body:** `{ "email": "reader@gmail.com" }`
-      * **Behavior:** Returns immediate success. Worker processes the email after a 5-second simulated delay.
-
-### 4\. System Health
-
-  * **Health Check:** `GET /health` (Checks DB connection status).
-
------
-
-## 🧪 Testing
-
-The project includes both Unit and Integration tests.
-
+## Tests
+Unit and integration tests are available:
 ```bash
-# Run Unit Tests (Isolated Service logic)
+# unit tests
 npm test
 
-# Run Integration Tests (Real DB connection via Docker)
-# Note: Requires docker-compose up -d to be running
+# integration tests (requires local infra)
 npm run test:int
 ```
 
------
+## Security & secrets guidance
+- Never include DB passwords, API keys, or JWT secrets in README or committed files.
+- Add `.env` to `.gitignore`.
+- Use 12+ bcrypt salt rounds or configure via SALT_ROUNDS env var.
+- Rotate any exposed secrets immediately.
 
-## 📦 Deployment (Render)
-
-This project is configured for deployment on **Render**.
-
-1.  **Build Command:** `npm install && npm run build`
-2.  **Start Command:** `npm run start:prod`
-3.  **Environment Variables:** Set `NODE_ENV=production` to enable SSL for database connections.
+For more details see SECURITY.md (new file added).

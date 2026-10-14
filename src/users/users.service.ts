@@ -17,8 +17,9 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Use explicit salt rounds from env (default to 12) to avoid ambiguous genSalt() behavior
+    const saltRounds = Number(process.env.SALT_ROUNDS ?? 12);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = this.usersRepository.create({
       email,
       password: hashedPassword,
